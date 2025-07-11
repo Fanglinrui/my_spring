@@ -39,3 +39,16 @@
 
 新建了以上的三个文件，并修改了 AbstractAutowireCapableBeanFactory，在其中加入了策略的默认值以及调用。  
 
+
+
+## 为 Bean 填充属性  
+
+> 分支 04
+
+- POM中添加了hutool  
+- BeanDefinition 中添加了 propertyValues 这个属性  
+- 定义了 propertyValue 包含 name 和 value  
+- 定义了 propertyValues 为数组类型的pv
+- 在 AbstractAutowireCapableBeanFactory中bean后添加了applyPropertyValue  
+
+具体变化可以通过 diff <branch1> <branch2> 来对比前后，为了方便查找，每次都会有序号

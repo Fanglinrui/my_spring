@@ -1,4 +1,4 @@
-package org.releaf.test.ioc;
+package org.releaf.test.ioc.serviece;
 
 public class HelloService {
 
