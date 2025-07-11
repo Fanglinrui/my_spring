@@ -61,3 +61,13 @@
 
 增加BeanReference类，包装一个bean对另一个bean的引用。实例化beanA后填充属性时，若PropertyValue#value为BeanReference，引用beanB，则先去实例化beanB。
 由于不想增加代码的复杂度提高理解难度，暂时不支持循环依赖，后面会在高级篇中解决该问题。
+
+## 资源和资源加载器  
+
+> 分支06  
+
+这一节应该是为了下一节的xml做准备  
+
+- 资源  
+  - ClassPathResource: `InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.path);`  
+  - 
