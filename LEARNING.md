@@ -51,4 +51,13 @@
 - 定义了 propertyValues 为数组类型的pv
 - 在 AbstractAutowireCapableBeanFactory中bean后添加了applyPropertyValue  
 
+具体填充属性的方法就是用反射，hutool中有BeanUtil这个东西
+
 具体变化可以通过 diff <branch1> <branch2> 来对比前后，为了方便查找，每次都会有序号
+
+## 为 Bean 注入 Bean
+
+> 分支05  
+
+增加BeanReference类，包装一个bean对另一个bean的引用。实例化beanA后填充属性时，若PropertyValue#value为BeanReference，引用beanB，则先去实例化beanB。
+由于不想增加代码的复杂度提高理解难度，暂时不支持循环依赖，后面会在高级篇中解决该问题。

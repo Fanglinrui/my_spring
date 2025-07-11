@@ -6,6 +6,8 @@ public class Person {
 
     private int age;
 
+    private Car car;
+
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
@@ -14,11 +16,16 @@ public class Person {
 
     public void setAge(int age) { this.age = age; }
 
+    public Car getCar() { return car; }
+
+    public void setCar(Car car) { this.car = car; }
+
     @Override
     public String toString(){
         return "Preson{" +
-                "name= '" + name + '\'' +
+                "name='" + name + '\'' +
                 ", age=" + age +
+                ", car=" + car +
                 '}';
     }
 }

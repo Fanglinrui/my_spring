@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import org.releaf.beans.BeansException;
 import org.releaf.beans.PropertyValue;
 import org.releaf.beans.factory.config.BeanDefinition;
+import org.releaf.beans.factory.config.BeanReference;
 
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory{
     private InstantiationStrategy  instantiationStrategy = new SimpleInstantiationStrategy();
@@ -52,6 +53,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             for(PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValues()){
                 String name = propertyValue.getName();
                 Object value = propertyValue.getValue();
+                // 为 bean 注入 bean
+                if( value instanceof BeanReference){
+                    BeanReference beanReference = (BeanReference)value;
+                    value = getBean(beanReference.getBeanName());
+                }
 
                 BeanUtil.setFieldValue(bean, name, value);
             }
