@@ -69,5 +69,25 @@
 这一节应该是为了下一节的xml做准备  
 
 - 资源  
-  - ClassPathResource: `InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.path);`  
-  - 
+  - ClassPathResource:
+
+    - ```java
+      InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.path);
+      ```
+  
+  - FileSystemResource：
+  
+    - ```java
+    Path path = new File(this.filePath).toPath();
+    return Files.newInputStream(path);
+  
+  - UrlResource
+  
+    - ```java
+      return urlConnection.getInputStream();
+      ```
+  
+- 资源加载器
+
+  - ResourceLoader接口则是资源查找定位策略的抽象，
+  - DefaultResourceLoader是其默认实现类
