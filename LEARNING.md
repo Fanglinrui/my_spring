@@ -91,3 +91,67 @@
 
   - ResourceLoader接口则是资源查找定位策略的抽象，
   - DefaultResourceLoader是其默认实现类
+
+## 在 xml 文件中定义 bean
+
+> 分支07  
+
+要实现“在 xml 中定义 bean”，需要这几个东西：
+
+- 资源加载器 —— 上一节实现的  
+- 抽象出读取bean定义信息的接口（BeanDefinitionReader），同时承担读取信息后的注册功能。以及对应的抽象实现类（AbstractBeanDefinitionReader）以及抽象实现类的实现类（XmlBeanDefinitionReader）
+  - **当前**从xml读取的是String类型，所以属性也就是String或引用其他bean，后续会有类型转换器  
+- 调整BeanFactory结构，相比于此前的内容新增了如下框内的东西，
+
+![image-20250712102638734](./LEARNING.assets/image-20250712102638734.png)
+
+其中：
+
+1. `BeanFactory`
+
+   - 提供最简单的 Bean 获取方法，如 `getBean(String name)`
+
+   - 延迟初始化 bean，适合轻量级场景
+
+   - 实际开发中较少直接使用，通常由 `ApplicationContext` 封装
+
+
+2. `ListableBeanFactory`
+
+   - 允许根据类型、注解等条件获取多个 bean，例如 `getBeansOfType(Class<T>)`
+
+   - 提供更强大的 bean 枚举能力
+
+
+3. `HierarchicalBeanFactory`
+
+   - 增加 `getParentBeanFactory()` 方法
+
+   - 可向父工厂查找 bean，提高容器复用性，适用于嵌套容器场景
+
+
+4. `AutowireCapableBeanFactory`
+
+   - 提供自动注入功能，例如 `autowireBean(Object existingBean)`
+
+   - 适用于将外部对象注入 Spring 容器管理的组件
+
+
+5. `ConfigurableBeanFactory`
+
+   - 支持配置 Bean 后处理器（如 `BeanPostProcessor`）、作用域注册、自定义属性编辑器等
+
+   - 可以设置容器特性，如 `setBeanClassLoader(ClassLoader cl)`
+
+
+6. `ConfigurableListableBeanFactory`
+
+   - 是最强大的 BeanFactory 扩展接口
+
+   - 除了包含前面所有功能，还支持：
+     - 修改 BeanDefinition
+     - 再处理 BeanFactoryPostProcessor
+     - 对 BeanDefinition 做高级解析和合并
+
+
+目前，大部分都只是个架子
