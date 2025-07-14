@@ -5,6 +5,7 @@ import org.releaf.beans.BeansException;
 import org.releaf.beans.PropertyValue;
 import org.releaf.beans.factory.config.AutowireCapableBeanFactory;
 import org.releaf.beans.factory.config.BeanDefinition;
+import org.releaf.beans.factory.config.BeanPostProcessor;
 import org.releaf.beans.factory.config.BeanReference;
 
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
@@ -23,6 +24,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             bean = createBeanInstance(beanDefinition);
             // 填充属性
             applyPropertyValues(beanName, bean, beanDefinition);
+            //执行bean的初始化方法和BeanPostProcessor的前置和后置处理方法
+            initializeBean(beanName, bean, beanDefinition);
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
@@ -73,5 +76,48 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
         this.instantiationStrategy = instantiationStrategy;
+    }
+
+    protected Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition){
+        // 执行BeanPostProcessor的前置处理
+        Object wrappedBean = applyBeanPostProcessorBeforeInitialization(bean, beanName);
+
+        //TODO 后续补充 bean的初始化方法
+        invokeInitMethods(beanName, wrappedBean, beanDefinition);
+
+        wrappedBean = applyBeanPostProcessorAfterInitialization(wrappedBean, beanName);
+        return wrappedBean;
+    }
+
+    @Override
+    public Object applyBeanPostProcessorBeforeInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for(BeanPostProcessor processor : getBeanPostProcessors()){
+            Object current = processor.postProcessBeforeInitialization(result, beanName);
+            if(current == null) {
+                return result;
+            }
+            result = current;
+        }
+        return result;
+    }
+
+    @Override
+    public Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for(BeanPostProcessor processor : getBeanPostProcessors()){
+            Object current = processor.postProcessAfterInitialization(result, beanName);
+            if(current == null) {
+                return result;
+            }
+            result = current;
+        }
+        return result;
+    }
+
+    protected void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition){
+
+        //TODO 后面实现，应该是下一节
+        System.out.println("执行bean[" + beanName +"]的初始化方法");
     }
 }

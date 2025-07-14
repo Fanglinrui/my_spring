@@ -4,4 +4,7 @@ import org.releaf.beans.factory.HierarchicalBeanFactory;
 import org.releaf.beans.factory.support.BeanDefinitionRegistry;
 
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
+
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
+
 }

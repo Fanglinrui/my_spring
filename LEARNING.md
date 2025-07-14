@@ -105,53 +105,37 @@
 
 ![image-20250712102638734](./LEARNING.assets/image-20250712102638734.png)
 
-其中：
-
-1. `BeanFactory`
-
-   - 提供最简单的 Bean 获取方法，如 `getBean(String name)`
-
-   - 延迟初始化 bean，适合轻量级场景
-
-   - 实际开发中较少直接使用，通常由 `ApplicationContext` 封装
-
-
-2. `ListableBeanFactory`
-
-   - 允许根据类型、注解等条件获取多个 bean，例如 `getBeansOfType(Class<T>)`
-
-   - 提供更强大的 bean 枚举能力
+- `BeanFactory`：提供最基础的获取`bean`信息的方法，如`getBean()`。
+  - `HierarchicalBeanFactory`：扩展 BeanFactory，提供**父子层级**Spring容器的基础方法，如`getParentBeanFactory()`。
+    - `ConfigurableBeanFactory`：扩展 HierarchicalBeanFactory，提供对容器配置的控制。如`addBeanPostProcessor()`。
+  - `ListableBeanFactory`：扩展 BeanFactory，提供了**批量查询** bean 的能力，适合列举容器中的 bean，如`getBeansOfType()`。
+  - `AutowireCapableBeanFactory`：扩展 BeanFactory，提供**自动装配**和 bean **生命周期**的细粒度控制，如`createBean()`。
+- `ConfigurableListableBeanFactory`：综合 ListableBeanFactory 和 ConfigurableBeanFactory 的功能，提供获取和修改`BeanDefinition`、预实例化单例对象的功能。如`getBeanDefinition()`。
+- `SingletonBeanRegistry`：定义**单例 bean** 的注册和获取接口，用于管理单例 bean，ConfigurableBeanFactory 继承了此接口。
+- `BeanDefinitionRegistry`：提供注册和移除 bean 定义的功能，用于动态修改 bean 定义，ConfigurableListable beanFactory 实现此接口。
 
 
-3. `HierarchicalBeanFactory`
 
-   - 增加 `getParentBeanFactory()` 方法
+## BeanFactoryPostProcessor和BeanPostProcesser  
 
-   - 可向父工厂查找 bean，提高容器复用性，适用于嵌套容器场景
+> 分支08-bean-factory-post-processor-and-bean-post-processor 
 
+根据原文档：
 
-4. `AutowireCapableBeanFactory`
+> BeanFactoryPostProcessor和BeanPostProcessor是spring框架中具有重量级地位的两个接口，理解了这两个接口的作用，基本就理解spring的核心原理了。为了降低理解难度分两个小节实现。
 
-   - 提供自动注入功能，例如 `autowireBean(Object existingBean)`
-
-   - 适用于将外部对象注入 Spring 容器管理的组件
-
-
-5. `ConfigurableBeanFactory`
-
-   - 支持配置 Bean 后处理器（如 `BeanPostProcessor`）、作用域注册、自定义属性编辑器等
-
-   - 可以设置容器特性，如 `setBeanClassLoader(ClassLoader cl)`
+- BeanFactoryPostProcessor是spring提供的容器扩展机制，允许我们在bean实例化之前修改bean的定义信息即BeanDefinition的信息。
+  - 在`getBean()`执行之前，修改的是propertyValues，采用的是直接覆盖  
+- BeanPostProcessor也是spring提供的容器扩展机制，不同于BeanFactoryPostProcessor的是，BeanPostProcessor在bean实例化后修改bean或替换bean。BeanPostProcessor是后面实现AOP的关键。
+  - 在`getBean()`执行时，填充属性之后，会遍历postBeanProcessors，Processor可以调用对象内定义的方法来修改属性  
 
 
-6. `ConfigurableListableBeanFactory`
 
-   - 是最强大的 BeanFactory 扩展接口
+- applyBeanPostProcessorsBefore/AfterInitialization是定义在AutowireCapableBeanFactory下的  
+- addBeanPostProcessor是定义在ConfigurableBeanFactory下的  
+- 为什么会这样呢？
+  - applyBeanPostProcessorBefore/AfterInitialization 定义在 AutowireCapableBeanFactory 中，因为它们负责 bean 初始化阶段的动态处理，属于 bean 生命周期管理的核心逻辑。
+  - 而 addBeanPostProcessor 定义在 ConfigurableBeanFactory 中，因为它是一个配置操作，负责向容器注册后处理器。这种设计体现了 Spring 的职责分离和层次化设计原则，使得框架更加模块化、灵活且易于维护。
+  - 理解上，重点其实是 “Initialization”导致它们分开了
+  - 每个接口具体的功能可以参考上一节
 
-   - 除了包含前面所有功能，还支持：
-     - 修改 BeanDefinition
-     - 再处理 BeanFactoryPostProcessor
-     - 对 BeanDefinition 做高级解析和合并
-
-
-目前，大部分都只是个架子
