@@ -33,12 +33,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         return beanDefinitionMap.containsKey(beanName);
     }
 
-    // TODO: 还没用到这个东西，搞不懂是干啥的
     @Override
     public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException {
         Map<String, T> result = new HashMap<String, T>();
         beanDefinitionMap.forEach((beanName, beanDefinition) -> {
             Class beanClass = beanDefinition.getBeanClass();
+            //判断type是不是beanClass的同级类/接口或父类/接口,如果是就实例化子类
             if(type.isAssignableFrom(beanClass)) {
                 T bean = (T) getBean(beanName);
                 result.put(beanName,bean);
