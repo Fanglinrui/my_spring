@@ -139,3 +139,40 @@
   - 理解上，重点其实是 “Initialization”导致它们分开了
   - 每个接口具体的功能可以参考上一节
 
+## 应用上下文ApplicationContext  
+
+> 分支09-application-context  
+
+文档原文写的很好，我直接拿过来：
+
+> 应用上下文ApplicationContext是spring中较之于BeanFactory更为先进的IOC容器，ApplicationContext除了拥有BeanFactory的所有功能外，还支持特殊类型bean如上一节中的BeanFactoryPostProcessor和BeanPostProcessor的自动识别、资源加载、容器事件和监听器、国际化支持、单例bean自动初始化等。
+>
+> BeanFactory是spring的基础设施，面向spring本身；而ApplicationContext面向spring的使用者，应用场合使用ApplicationContext。
+
+总的来说，就是把之前手动做的，这里全都自动做了，有种封装的感觉
+
+关键函数：`AbstractApplicationContext#refresh`
+
+```java
+@Override
+public void refresh() throws BeansException{
+    //创建BeanFactory，并加载BeanDefinition
+    refreshBeanFactory();
+    ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+
+    //在bean实例化之前，执行BeanFactoryPostProcessor
+    invokeBeanFactoryPostProcessors(beanFactory);
+
+    //BeanPostProcessor需要提前与其他bean实例化之前注册
+    registerBeanPostProcessors(beanFactory);
+
+    //提前实例化单例bean
+    beanFactory.preInstantiateSingletons();
+
+}
+```
+
+从bean的角度看，目前生命周期如下：
+
+![application-context-life-cycle](./LEARNING.assets/application-context-life-cycle.png)
+

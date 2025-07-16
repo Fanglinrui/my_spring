@@ -15,4 +15,8 @@
     <bean id="car" class="org.releaf.test.ioc.bean.Car">
         <property name="brand" value="porsche"/>
     </bean>
+
+    <bean class="org.releaf.test.ioc.common.CustomBeanPostProcessor"/>
+
+    <bean class="org.releaf.test.ioc.common.CustomBeanFactoryPostProcessor"/>
 </beans>
