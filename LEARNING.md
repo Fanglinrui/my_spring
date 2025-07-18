@@ -176,3 +176,50 @@ public void refresh() throws BeansException{
 
 ![application-context-life-cycle](./LEARNING.assets/application-context-life-cycle.png)
 
+## bean的初始化和销毁方法  
+
+> 分支：10-init-and-destroy-method  
+
+> 在spring中，定义bean的初始化和销毁方法有三种方法：
+>
+> - 在xml文件中制定init-method和destroy-method
+> - 继承自InitializingBean和DisposableBean
+> - 在方法上加注解PostConstruct和PreDestroy
+>
+> 第三种通过BeanPostProcessor实现，在扩展篇中实现，本节只实现前两种。
+>
+> 针对第一种在xml文件中指定初始化和销毁方法的方式，在BeanDefinition中增加属性initMethodName和destroyMethodName。
+>
+> 初始化方法在AbstractAutowireCapableBeanFactory#invokeInitMethods执行。DefaultSingletonBeanRegistry中增加属性disposableBeans保存拥有销毁方法的bean，拥有销毁方法的bean在AbstractAutowireCapableBeanFactory#registerDisposableBeanIfNecessary中注册到disposableBeans中。
+>
+> 为了确保销毁方法在虚拟机关闭之前执行，向虚拟机中注册一个钩子方法，查看AbstractApplicationContext#registerShutdownHook（非web应用需要手动调用该方法）。当然也可以手动调用ApplicationContext#close方法关闭容器。
+
+几个点注意一下：
+
+初始化方法： afterPropertySet() 执行后，再执行自定义的init-method
+
+销毁方法：先执行继承的destroy()，后执行自定义  
+
+为了确保销毁方法在虚拟机关闭之前执行，向虚拟机中注册一个钩子方法：AbstractApplicationContext#registerShutdownHook
+
+- 到此为止，bean的生命周期如下：
+
+![init-and-destroy-method](./LEARNING.assets/init-and-destroy-method.png)
+
+
+
+## 一些基础知识  
+
+```java
+if (obj instanceof MyClass) {
+    // obj 是 MyClass 或其子类的实例
+}
+```
+
+| 特性     | `instanceof`             | `isAssignableFrom`                     |
+| -------- | ------------------------ | -------------------------------------- |
+| 比较的是 | 对象 和 类型             | 类型 和 类型                           |
+| 示例     | `obj instanceof A`       | `A.class.isAssignableFrom(B.class)`    |
+| 判断方向 | obj 是 A 的实例吗？      | B 是否是 A 的子类或实现类？            |
+| 用途     | 安全地强制类型转换前判断 | 动态分析类的继承关系、适配类型         |
+| 常见场景 | 多态下做对象识别         | 反射、泛型、框架注册时做类型兼容性判断 |
