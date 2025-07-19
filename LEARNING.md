@@ -208,6 +208,30 @@ public void refresh() throws BeansException{
 
 
 
+## Aware 接口  
+
+> 分支11-aware-interface
+
+正如文档所说，这个接口是标记类接口，实现它的类可以获得容器的相关信息，比如这里实现的两个常用的`BeanFactoryAware` 以及 `ApplicationContextAware`  
+
+
+
+要在实现接口的类里面添加对应的属性，并定义set函数，感知beanFactory可以在initializeBean进行，通过直接判断，
+
+感知ApplicationContext则需要beanPostProcessor，会在开始添加处理器，处理器会对实现ApplicationContextAware的bean调用对应的set
+
+
+
+更新的生命周期：
+
+![aware-interface](./LEARNING.assets/aware-interface.png)  
+
+
+
+
+
+
+
 ## 一些基础知识  
 
 ```java

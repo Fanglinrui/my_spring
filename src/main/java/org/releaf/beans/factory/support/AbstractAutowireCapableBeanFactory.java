@@ -5,6 +5,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import org.releaf.beans.BeansException;
 import org.releaf.beans.PropertyValue;
+import org.releaf.beans.factory.BeanFactoryAware;
 import org.releaf.beans.factory.DisposableBean;
 import org.releaf.beans.factory.InitializingBean;
 import org.releaf.beans.factory.config.AutowireCapableBeanFactory;
@@ -95,6 +96,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     protected Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition){
+
+        if(bean instanceof BeanFactoryAware){
+            ((BeanFactoryAware)bean).setBeanFactory(this);
+        }
+
         // 执行BeanPostProcessor的前置处理
         Object wrappedBean = applyBeanPostProcessorBeforeInitialization(bean, beanName);
 
@@ -149,7 +155,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
         String initMethodName = beanDefinition.getInitMethodName();
         //避免重复执行初始化方法
-        if(StrUtil.isNotEmpty(initMethodName) && !((bean instanceof InitializingBean) && "afterPropertiesSet".equals(initMethodName))){
+        // if(StrUtil.isNotEmpty(initMethodName) && !((bean instanceof InitializingBean) && "afterPropertiesSet".equals(initMethodName))){
+        if(StrUtil.isNotEmpty(initMethodName)){
             Method initMethod = ClassUtil.getPublicMethod(beanDefinition.getBeanClass(), initMethodName);
             if(initMethod == null){
                 throw new BeansException("Could not find an init method named '" + initMethodName + "'on bean named '" + beanName + "'");

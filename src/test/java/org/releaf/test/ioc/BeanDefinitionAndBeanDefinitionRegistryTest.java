@@ -3,7 +3,7 @@ package org.releaf.test.ioc;
 import org.junit.Test;
 import org.releaf.beans.factory.config.BeanDefinition;
 import org.releaf.beans.factory.support.DefaultListableBeanFactory;
-import org.releaf.test.ioc.serviece.HelloService;
+import org.releaf.test.ioc.service.HelloService;
 
 public class BeanDefinitionAndBeanDefinitionRegistryTest {
 
