@@ -19,4 +19,6 @@
     <bean class="org.releaf.test.ioc.common.CustomBeanPostProcessor"/>
 
     <bean class="org.releaf.test.ioc.common.CustomBeanFactoryPostProcessor"/>
+
+    <bean id="helloService" class="org.releaf.test.ioc.service.HelloService"/>
 </beans>

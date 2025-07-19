@@ -7,6 +7,7 @@ import org.releaf.beans.factory.config.SingletonBeanRegistry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
@@ -28,7 +29,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     }
 
     public void destroySingletons(){
-        ArrayList<String> beanNames = new ArrayList<>(disposableBeanMap.keySet());
+        Set<String> beanNames = disposableBeanMap.keySet();
         for(String beanName : beanNames){
             DisposableBean disposableBean = disposableBeanMap.remove(beanName);
             try{
