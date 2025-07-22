@@ -228,9 +228,32 @@ public void refresh() throws BeansException{
 
 
 
+## bean作用域，增加prototype
 
+> 分支12-prototype-bean  
 
+在 Spring 中，`singleton` 和 `prototype` 是两种常见的 Bean 作用域，它们决定了容器如何创建和管理 Bean 实例。下面是它们的核心区别：
 
+| 特性       | `singleton`                    | `prototype`                                 |
+| ---------- | ------------------------------ | ------------------------------------------- |
+| 实例数量   | 每个 Spring 容器中只有一个实例 | 每次请求都会创建一个新实例                  |
+| 生命周期   | 容器启动时创建，容器关闭时销毁 | 每次调用 `getBean()` 时创建，容器不负责销毁 |
+| 默认作用域 | 是                             | 否（需显式声明）                            |
+| 适用场景   | 无状态 Bean（如 DAO、Service） | 有状态 Bean（如用户会话、临时数据）         |
+
+实现的关键点：
+
+BeanDefinition 中添加新属性判断是否为单例  
+
+提前实例化环节通过新属性判断是否进行实例化  
+
+getBean 通过新属性判断实例化后是否加入singleton的map里面  
+
+registerDisposableBeanIfNecessary方法中通过新属性判断prototype作用域bean不执行销毁方法
+
+至止，bean的生命周期如下：
+
+![prototype-bean](./LEARNING.assets/prototype-bean.png)
 
 ## 一些基础知识  
 
