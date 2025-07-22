@@ -86,7 +86,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                 throw new BeansException("Cannot find class [" + className +"]");
             }
             //id优先于name
-            beanName = StrUtil.isEmpty(beanId) ? beanId : beanName;
+            beanName = StrUtil.isNotEmpty(beanId) ? beanId : beanName;
             if(StrUtil.isEmpty(beanName)){
                 //如果id和name都为空，将类名的第一个字母转为小写后作为bean的名称
                 beanName = StrUtil.lowerFirst(clazz.getSimpleName());
@@ -99,7 +99,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                 beanDefinition.setScope(beanScope);
             }
 
-            List<Element> propertyList = beans.elements(PROPERTY_ELEMENT);
+            List<Element> propertyList = bean.elements(PROPERTY_ELEMENT);
             for(Element property : propertyList){
                 // property tag
                 String propertyNameAttribute = property.attributeValue(NAME_ATTRIBUTE);
@@ -112,7 +112,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
                 Object value = propertyValueAttribute;
                 if(StrUtil.isNotEmpty(propertyRefAttribute)){
-                    value = new BeanReference(propertyNameAttribute);
+                    value = new BeanReference(propertyRefAttribute);
                 }
                 PropertyValue propertyValue = new PropertyValue(propertyNameAttribute, value);
                 beanDefinition.getPropertyValues().addPropertyValue(propertyValue);

@@ -255,6 +255,18 @@ registerDisposableBeanIfNecessary方法中通过新属性判断prototype作用�
 
 ![prototype-bean](./LEARNING.assets/prototype-bean.png)
 
+## FactoryBean  
+
+> 分支13-factory-bean
+
+在 Spring 中，`FactoryBean` 是一个非常特别的接口，它的作用是**定制 Bean 的创建过程**，尤其适用于那些初始化逻辑复杂、需要动态生成或代理的对象。
+
+在getBean时处理逻辑与常规bean产生分化  
+
+新加了一个缓存`factoryBeanObjectCache`用于存储由FactoryBean制造的bean
+
+
+
 ## 一些基础知识  
 
 ```java
