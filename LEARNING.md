@@ -265,9 +265,23 @@ registerDisposableBeanIfNecessary方法中通过新属性判断prototype作用�
 
 新加了一个缓存`factoryBeanObjectCache`用于存储由FactoryBean制造的bean
 
+## 容器事件和事件监听器  
+
+> 分支14-event-and-event-listener
+
+`applicationEventMulticaster`中包含了一个集合用来存储Listeners；
+
+事件通过 `applicationEventMulticaster.multicastEvent(event);` 进行广播
+
+广播的具体方式是遍历监听器集合，通过`supportsEvent(applicationListener, event)`来确定某个监听器(`ApplicationListener<ApplicationEvent>`）是否对该事件“感兴趣”（support函数的作用是如果event是ApplicationEvent或其子类，则返回true）
 
 
-## 一些基础知识  
+
+
+
+# 附录
+
+### 类型判断相关  
 
 ```java
 if (obj instanceof MyClass) {
@@ -282,3 +296,4 @@ if (obj instanceof MyClass) {
 | 判断方向 | obj 是 A 的实例吗？      | B 是否是 A 的子类或实现类？            |
 | 用途     | 安全地强制类型转换前判断 | 动态分析类的继承关系、适配类型         |
 | 常见场景 | 多态下做对象识别         | 反射、泛型、框架注册时做类型兼容性判断 |
+
