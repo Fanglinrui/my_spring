@@ -6,8 +6,8 @@ import org.releaf.beans.PropertyValues;
 import org.releaf.beans.factory.config.BeanDefinition;
 import org.releaf.beans.factory.config.BeanReference;
 import org.releaf.beans.factory.support.DefaultListableBeanFactory;
-import org.releaf.test.ioc.bean.Car;
-import org.releaf.test.ioc.bean.Person;
+import org.releaf.test.bean.Car;
+import org.releaf.test.bean.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

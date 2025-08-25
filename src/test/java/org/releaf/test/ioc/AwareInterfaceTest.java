@@ -2,7 +2,7 @@ package org.releaf.test.ioc;
 
 import org.junit.Test;
 import org.releaf.context.support.ClassPathXmlApplicationContext;
-import org.releaf.test.ioc.service.HelloService;
+import org.releaf.test.service.HelloService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

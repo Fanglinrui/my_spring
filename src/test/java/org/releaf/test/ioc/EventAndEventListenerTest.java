@@ -2,7 +2,7 @@ package org.releaf.test.ioc;
 
 import org.junit.Test;
 import org.releaf.context.support.ClassPathXmlApplicationContext;
-import org.releaf.test.ioc.common.event.CustomEvent;
+import org.releaf.test.common.event.CustomEvent;
 
 public class EventAndEventListenerTest {
 

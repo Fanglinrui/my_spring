@@ -1,7 +1,7 @@
-package org.releaf.test.ioc.common;
+package org.releaf.test.common;
 
 import org.releaf.beans.factory.FactoryBean;
-import org.releaf.test.ioc.bean.Car;
+import org.releaf.test.bean.Car;
 
 public class CarFactoryBean implements FactoryBean<Car> {
 

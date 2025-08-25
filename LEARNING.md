@@ -275,6 +275,34 @@ registerDisposableBeanIfNecessary方法中通过新属性判断prototype作用�
 
 广播的具体方式是遍历监听器集合，通过`supportsEvent(applicationListener, event)`来确定某个监听器(`ApplicationListener<ApplicationEvent>`）是否对该事件“感兴趣”（support函数的作用是如果event是ApplicationEvent或其子类，则返回true）
 
+# 基础篇：AOP  
+
+## 切点表达式  
+
+> 分支15-pointcut-expression  
+
+Joinpoint，织入点，指需要执行代理操作的某个类的某个方法(仅支持方法级别的JoinPoint)；Pointcut是JoinPoint的表述方式，能捕获JoinPoint。
+
+最常用的切点表达式是AspectJ的切点表达式。需要匹配类，定义ClassFilter接口；匹配方法，定义MethodMatcher接口。PointCut需要同时匹配类和方法，包含ClassFilter和MethodMatcher，AspectJExpressionPointcut是支持AspectJ切点表达式的PointCut实现，简单实现仅支持execution函数。
+
+**解析 AspectJ 表达式** → `execution(* com.xxx..*(..))`
+
+**实现 Pointcut 接口** → 提供给 Spring AOP 使用
+
+**同时扮演 ClassFilter & MethodMatcher** → 能判断类和方法是否匹配
+
+---
+
+POM中引入了两个模块：
+
+- **aopalliance:aopalliance:1.0**  
+  - **AOP Alliance（AOP 联盟）接口标准库**。
+  - 它是早期 Java 社区为 AOP 定义的一套**统一接口规范**（类似 JDBC 之于数据库）。
+- **org.aspectj:aspectjweaver:1.8.0**
+  - **AspectJ 的核心织入库**。
+  - 它负责在运行时或类加载时，把切面代码 **织入（weave）** 到目标类里。
+  - 实现了 AspectJ 的 `@Aspect` 注解支持。
+
 
 
 

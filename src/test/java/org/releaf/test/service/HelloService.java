@@ -1,4 +1,4 @@
-package org.releaf.test.ioc.service;
+package org.releaf.test.service;
 
 import org.releaf.beans.BeansException;
 import org.releaf.beans.factory.BeanFactory;

@@ -1,4 +1,4 @@
-package org.releaf.test.ioc.bean;
+package org.releaf.test.bean;
 
 import org.releaf.beans.factory.DisposableBean;
 import org.releaf.beans.factory.InitializingBean;

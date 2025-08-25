@@ -1,8 +1,8 @@
-package org.releaf.test.ioc.common;
+package org.releaf.test.common;
 
 import org.releaf.beans.BeansException;
 import org.releaf.beans.factory.config.BeanPostProcessor;
-import org.releaf.test.ioc.bean.Car;
+import org.releaf.test.bean.Car;
 
 public class CustomBeanPostProcessor implements BeanPostProcessor {
 

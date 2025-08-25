@@ -1,4 +1,4 @@
-package org.releaf.test.ioc.common;
+package org.releaf.test.common;
 
 import org.releaf.beans.BeansException;
 import org.releaf.beans.PropertyValue;
