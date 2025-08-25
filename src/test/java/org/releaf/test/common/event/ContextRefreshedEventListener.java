@@ -1,4 +1,4 @@
-package org.releaf.test.ioc.common.event;
+package org.releaf.test.common.event;
 
 import org.releaf.context.ApplicationListener;
 import org.releaf.context.event.ContextRefreshedEvent;

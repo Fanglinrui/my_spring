@@ -3,8 +3,8 @@ package org.releaf.test.ioc;
 import org.junit.Test;
 import org.releaf.beans.factory.support.DefaultListableBeanFactory;
 import org.releaf.beans.factory.xml.XmlBeanDefinitionReader;
-import org.releaf.test.ioc.bean.Car;
-import org.releaf.test.ioc.bean.Person;
+import org.releaf.test.bean.Car;
+import org.releaf.test.bean.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

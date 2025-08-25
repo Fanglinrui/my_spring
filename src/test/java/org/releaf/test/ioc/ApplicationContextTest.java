@@ -2,8 +2,8 @@ package org.releaf.test.ioc;
 
 import org.junit.Test;
 import org.releaf.context.support.ClassPathXmlApplicationContext;
-import org.releaf.test.ioc.bean.Car;
-import org.releaf.test.ioc.bean.Person;
+import org.releaf.test.bean.Car;
+import org.releaf.test.bean.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

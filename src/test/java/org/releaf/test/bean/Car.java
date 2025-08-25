@@ -1,4 +1,4 @@
-package org.releaf.test.ioc.bean;
+package org.releaf.test.bean;
 
 public class Car {
 
