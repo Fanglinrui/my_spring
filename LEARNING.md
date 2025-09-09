@@ -309,7 +309,18 @@ POM中引入了两个模块：
 
 > 分支16-jdk-dynamic-proxy  
 
+各种信息通过 `AdvisedSupport` 进行封装，然后``JdkDynamicAopProxy` 调用 **Java反射包**中的
 
+```java
+@NotNull
+public static Object newProxyInstance(
+    ClassLoader loader,
+    @NotNull   Class<?>[] interfaces,
+    @NotNull   java.lang.reflect.InvocationHandler h
+)
+```
+
+所以叫 “基于**JDK**的动态代理”  
 
 # 附录
 
