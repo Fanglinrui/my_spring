@@ -322,6 +322,47 @@ public static Object newProxyInstance(
 
 所以叫 “基于**JDK**的动态代理”  
 
+
+
+## 基于CGLIB的动态代理  
+
+> 分支17-cglib-dynamic-proxy
+
+与基于JDK的动态代理在运行期间为接口生成对象的代理对象不同，基于CGLIB的动态代理能在运行期间动态构建字节码的class文件，为类生成子类，因此被代理类不需要继承自任何接口。
+
+核心在这：
+
+`CglibAopProxy#getProxy()`
+
+```java
+enhancer.setSuperclass(target.getClass()); // 父类是目标类
+enhancer.setInterfaces(ts.getTargetClass()); // 可选：附加接口
+```
+
+
+
+更具体的对比两种代理可以查看[[附录这里]](#通过`TargetSource#getTargetClass()` 来区分两种动态代理  )
+
+
+
+构建时遇到了这个错误
+
+```exception
+Caused by: java.lang.reflect.InaccessibleObjectException: 
+Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass(...)
+accessible: module java.base does not "opens java.lang" to unnamed module
+```
+
+是因为CGLIB 在底层用反射调用 `ClassLoader#defineClass` 来生成代理类，但 **JDK 9+ 的模块化机制**（JPMS）默认不允许随便反射访问 `java.lang.ClassLoader` 的受保护方法。
+
+人话就是版本高了，下个低版本的SDK装上就行（用高版本SDK但改语言级别没用）
+
+
+
+
+
+
+
 # 附录
 
 ### 类型判断相关  
@@ -339,4 +380,35 @@ if (obj instanceof MyClass) {
 | 判断方向 | obj 是 A 的实例吗？      | B 是否是 A 的子类或实现类？            |
 | 用途     | 安全地强制类型转换前判断 | 动态分析类的继承关系、适配类型         |
 | 常见场景 | 多态下做对象识别         | 反射、泛型、框架注册时做类型兼容性判断 |
+
+### 通过`TargetSource#getTargetClass()` 来区分两种动态代理  
+
+`getTargetClass()` 的定义
+
+```java
+public class TargetSource {
+    private final Object target;
+
+    public TargetSource(Object target) {
+        this.target = target;
+    }
+
+    public Class<?>[] getTargetClass() {
+        return this.target.getClass().getInterfaces();
+    }
+
+    public Object getTarget() {
+        return this.target;
+    }
+}
+```
+
+`getTargetClass()` **不是返回目标对象的 Class 本身**，而是返回目标对象实现的所有接口（`Class<?>[]`）。
+
+为什么？
+
+- 因为 JDK 动态代理只能基于接口生成代理类。
+- 所以如果你走 JDK 动态代理，就得知道目标对象有哪些接口。
+
+对于 CGLIB 代理，通常用的是 `setSuperclass(target.getClass())`，就不依赖接口了
 
