@@ -357,9 +357,11 @@ accessible: module java.base does not "opens java.lang" to unnamed module
 
 人话就是版本高了，下个低版本的SDK装上就行（用高版本SDK但改语言级别没用）
 
+## AOP代理工厂  
 
+> 分支18-proxy-factory
 
-
+巨简单，增加AOP代理工厂ProxyFactory，由AdvisedSupport#proxyTargetClass属性决定使用JDK动态代理还是CGLIB动态代理。
 
 
 
