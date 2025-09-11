@@ -8,6 +8,7 @@ import org.releaf.aop.TargetSource;
 import org.releaf.aop.aspectj.AspectJExpressionPointcut;
 import org.releaf.aop.framework.CglibAopProxy;
 import org.releaf.aop.framework.JdkDynamicAopProxy;
+import org.releaf.aop.framework.ProxyFactory;
 import org.releaf.test.common.WorldServiceInterceptor;
 import org.releaf.test.service.WorldService;
 import org.releaf.test.service.WorldServiceImpl;
@@ -40,6 +41,19 @@ public class DynamicProxyTest {
     @Test
     public void testCglibDynamicProxy() throws Exception {
         WorldService proxy = (WorldService) new CglibAopProxy(advisedSupport).getProxy();
+        proxy.explode();
+    }
+
+    @Test
+    public void testProxyFactory() throws Exception {
+        // 使用JDK代理
+        advisedSupport.setProxyTargetClass(false);
+        WorldService proxy = (WorldService) new ProxyFactory(advisedSupport).getProxy();
+        proxy.explode();
+
+        // CGLIB
+        advisedSupport.setProxyTargetClass(true);
+        WorldService proxy2 = (WorldService) new ProxyFactory(advisedSupport).getProxy();
         proxy.explode();
     }
 
