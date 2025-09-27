@@ -400,17 +400,19 @@ Advisor是包含**一个**Pointcut和一个Advice的组合，Pointcut用于捕�
 
 适配器模式里就是：**一个 Advice → 一个对应的 Interceptor**。
 
-一个 MethodBeforeInterceptor 如何 调起另一个 MethodBeforeInterceptor？  
+- 一个 MethodBeforeInterceptor 如何 调起另一个 MethodBeforeInterceptor？  
+  - **调用下一个 Interceptor 的方式就是 `invocation.proceed()`**。
+  - 当前的 MethodInvocation 中还没有实现链式调用，后续可能会做。具体的逻辑就是维护一个List用来保存各个 Interceptor
 
-**调用下一个 Interceptor 的方式就是 `invocation.proceed()`**。
 
-当前的 MethodInvocation 中还没有实现链式调用，后续可能会做。具体的逻辑就是维护一个List用来保存各个 Interceptor
+
+
 
 
 
 # 附录
 
-### 类型判断相关  
+## 类型判断相关  
 
 ```java
 if (obj instanceof MyClass) {
@@ -426,7 +428,7 @@ if (obj instanceof MyClass) {
 | 用途     | 安全地强制类型转换前判断 | 动态分析类的继承关系、适配类型         |
 | 常见场景 | 多态下做对象识别         | 反射、泛型、框架注册时做类型兼容性判断 |
 
-### 通过`TargetSource#getTargetClass()` 来区分两种动态代理  
+## 通过`TargetSource#getTargetClass()` 来区分两种动态代理  
 
 `getTargetClass()` 的定义
 
@@ -457,3 +459,58 @@ public class TargetSource {
 
 对于 CGLIB 代理，通常用的是 `setSuperclass(target.getClass())`，就不依赖接口了
 
+## Spring AOP 执行链路
+
+### 1. 开发者层
+
+- **Pointcut**：定义“在哪些连接点拦截”（比如某个包下的方法）。
+- **Advice**：定义“拦截后做什么逻辑”（Before、After、Around...）。
+
+------
+
+### 2. Spring 适配阶段
+
+1. **Advice → Interceptor**
+   - Spring 用 **`AdvisorAdapterRegistry`**（默认实现 `DefaultAdvisorAdapterRegistry`）来识别 Advice 类型。
+   - 每种 Advice 都有对应的 **Adapter**，把它适配为统一的 `MethodInterceptor`：
+     - `MethodBeforeAdvice` → `MethodBeforeAdviceInterceptor`
+     - `AfterReturningAdvice` → `AfterReturningAdviceInterceptor`
+     - `ThrowsAdvice` → `ThrowsAdviceInterceptor`
+     - `AroundAdvice`（本身就是 `MethodInterceptor`，直接用）
+     - 当 Spring 需要用到 Advice 时：
+       1. `AdvisorAdapterRegistry` 会检查 Advice 的类型（instanceof）。
+       2. 找到能处理它的 Adapter。
+       3. 调用该 Adapter 的 `getInterceptor(advisor)` 方法，返回对应的 `MethodInterceptor`。
+2. **Pointcut + Advice → Advisor**
+   - Spring 把 Advice（已转成 Interceptor）和 Pointcut 组合成 **Advisor**（最小 AOP 单元）。
+3. **收集 Advisor → AdvisedSupport**
+   - Spring 把目标对象 + 所有 Advisor 封装进 `AdvisedSupport`（代理配置对象）。
+
+------
+
+### 3. 代理创建阶段
+
+- `ProxyFactory` 根据 `AdvisedSupport` 创建代理对象：
+  - 如果目标类实现接口 → 用 **JDK 动态代理**。
+  - 否则 → 用 **CGLIB**。
+
+------
+
+### 4. 运行时执行
+
+1. 调用代理对象的方法 → 进入代理。
+2. 代理根据方法信息，筛选出匹配的 Advisor → 得到 Interceptor 列表。
+3. Spring 用 `ReflectiveMethodInvocation.proceed()` 来驱动拦截器链：
+   - 每个 Interceptor 执行自己的逻辑（调用 Advice）。
+   - 然后调用 `proceed()` 进入下一个 Interceptor。
+   - 最后执行目标方法。
+
+执行顺序就是典型的 **洋葱模型**：
+
+```
+BeforeAdviceInterceptor
+    → Another BeforeAdviceInterceptor
+        → targetMethod()
+    ← AfterReturningAdviceInterceptor
+← ThrowsAdviceInterceptor
+```
