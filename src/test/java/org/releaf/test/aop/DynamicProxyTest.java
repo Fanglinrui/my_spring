@@ -1,12 +1,11 @@
 package org.releaf.test.aop;
 
+import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.Before;
 import org.junit.Test;
-import org.releaf.aop.AdvisedSupport;
-import org.releaf.aop.GenericInterceptor;
-import org.releaf.aop.MethodMatcher;
-import org.releaf.aop.TargetSource;
+import org.releaf.aop.*;
 import org.releaf.aop.aspectj.AspectJExpressionPointcut;
+import org.releaf.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.releaf.aop.framework.CglibAopProxy;
 import org.releaf.aop.framework.JdkDynamicAopProxy;
 import org.releaf.aop.framework.ProxyFactory;
@@ -137,6 +136,34 @@ public class DynamicProxyTest {
 
         WorldService proxy = (WorldService) new ProxyFactory(advisedSupport).getProxy();
         proxy.explode();
+    }
+
+    @Test
+    public void testAdvisor() throws Exception {
+        WorldService worldService = new WorldServiceImpl();
+
+        // Advisor = Advice + Pointcut
+        String expression = "execution(* org.releaf.test.service.WorldService.explode(..))";
+        AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
+        advisor.setExpression(expression);
+
+        GenericInterceptor methodInterceptor = new GenericInterceptor();
+        methodInterceptor.setBeforeAdvice(new WorldServiceBeforeAdvice());
+        advisor.setAdvice(methodInterceptor);
+
+        ClassFilter classFilter = advisor.getPointcut().getClassFilter();
+        if(classFilter.matches(worldService.getClass())) {
+            AdvisedSupport advisedSupport = new AdvisedSupport();
+
+            TargetSource targetSource = new TargetSource(worldService);
+            advisedSupport.setTargetSource(targetSource);
+            advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
+            advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
+//            advisedSupport.setProxyTargetClass(true); // JDK / CGLIB
+
+            WorldService proxy = (WorldService) new ProxyFactory(advisedSupport).getProxy();
+            proxy.explode();
+        }
     }
 
 }

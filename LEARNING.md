@@ -365,7 +365,7 @@ accessible: module java.base does not "opens java.lang" to unnamed module
 
 
 
-## 常见Advice之BeforeAdvice
+## 常见Advice
 
 > 分支19-common-advice  
 
@@ -386,7 +386,25 @@ try {
 afterReturningAdvice.afterReturning();
 ```
 
+注意，实际中是每个Advice对应一种Interceptor（下一节提到的适配器模式），而不是这样的“通用”
 
+
+
+## PointcutAdvisor: Point 和 Advice 的组合  
+
+> 分支20-pointcut-advisor  
+
+Advisor是包含**一个**Pointcut和一个Advice的组合，Pointcut用于捕获JoinPoint，Advice决定在JoinPoint执行某种操作。
+
+可以把 Advisor 看作是一个AOP切面的最小单位  
+
+适配器模式里就是：**一个 Advice → 一个对应的 Interceptor**。
+
+一个 MethodBeforeInterceptor 如何 调起另一个 MethodBeforeInterceptor？  
+
+**调用下一个 Interceptor 的方式就是 `invocation.proceed()`**。
+
+当前的 MethodInvocation 中还没有实现链式调用，后续可能会做。具体的逻辑就是维护一个List用来保存各个 Interceptor
 
 
 
