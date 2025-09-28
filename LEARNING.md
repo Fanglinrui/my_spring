@@ -425,10 +425,6 @@ DefaultAdvisorAutoProxyCreator是处理横切逻辑的织入返回代理对象�
 
 ## getSingleton() 相关的优化  
 
-> 分支22-better-singleton
-
-新增了 ObjectFactory 这个接口，然后重载了 getSingleton() 这个方法，并稍微修改了getBean的逻辑，从而使代理对象能够加入 singletonObjects
-
 
 
 
