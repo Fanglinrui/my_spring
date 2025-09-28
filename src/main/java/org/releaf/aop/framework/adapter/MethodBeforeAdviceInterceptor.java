@@ -1,9 +1,8 @@
 package org.releaf.aop.framework.adapter;
 
-import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.releaf.aop.framework.MethodBeforeAdvice;
+import org.releaf.aop.MethodBeforeAdvice;
 
 public class MethodBeforeAdviceInterceptor implements MethodInterceptor {
     private MethodBeforeAdvice advice;

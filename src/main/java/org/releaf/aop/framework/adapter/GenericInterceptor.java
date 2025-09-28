@@ -1,7 +1,11 @@
-package org.releaf.aop;
+package org.releaf.aop.framework.adapter;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.releaf.aop.AfterAdvice;
+import org.releaf.aop.AfterReturningAdvice;
+import org.releaf.aop.BeforeAdvice;
+import org.releaf.aop.ThrowsAdvice;
 
 public class GenericInterceptor implements MethodInterceptor {
     private BeforeAdvice beforeAdvice;

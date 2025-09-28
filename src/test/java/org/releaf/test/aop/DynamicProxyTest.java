@@ -9,6 +9,7 @@ import org.releaf.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.releaf.aop.framework.CglibAopProxy;
 import org.releaf.aop.framework.JdkDynamicAopProxy;
 import org.releaf.aop.framework.ProxyFactory;
+import org.releaf.aop.framework.adapter.GenericInterceptor;
 import org.releaf.test.common.*;
 import org.releaf.test.service.WorldService;
 import org.releaf.test.service.WorldServiceImpl;
