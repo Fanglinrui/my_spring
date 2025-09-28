@@ -1,6 +1,4 @@
-package org.releaf.aop.framework;
-
-import org.releaf.aop.BeforeAdvice;
+package org.releaf.aop;
 
 import java.lang.reflect.Method;
 

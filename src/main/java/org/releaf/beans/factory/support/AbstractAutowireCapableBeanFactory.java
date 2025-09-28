@@ -8,10 +8,7 @@ import org.releaf.beans.PropertyValue;
 import org.releaf.beans.factory.BeanFactoryAware;
 import org.releaf.beans.factory.DisposableBean;
 import org.releaf.beans.factory.InitializingBean;
-import org.releaf.beans.factory.config.AutowireCapableBeanFactory;
-import org.releaf.beans.factory.config.BeanDefinition;
-import org.releaf.beans.factory.config.BeanPostProcessor;
-import org.releaf.beans.factory.config.BeanReference;
+import org.releaf.beans.factory.config.*;
 
 import java.lang.reflect.Method;
 
@@ -20,7 +17,47 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
+
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
+        if (bean != null) {
+            return bean;
+        }
+
         return doCreateBean(beanName, beanDefinition);
+    }
+
+    /**
+     * 执行 InstantiationAwareBeanPostProcessor 的方法，如果bean需要代理，直接返回代理对象
+     *
+     * @param beanName
+     * @param beanDefinition
+     * @return
+     */
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorBeforeInitialization(beanDefinition.getBeanClass(), beanName);
+        if (bean != null) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    /**
+     * 进针对代理的bean
+     *
+     * @param beanClass
+     * @param beanName
+     * @return
+     */
+    protected Object applyBeanPostProcessorBeforeInitialization(Class beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInitialization(beanClass, beanName);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     private Object doCreateBean(String beanName, BeanDefinition beanDefinition) {
@@ -107,7 +144,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
 
         // 执行BeanPostProcessor的前置处理
-        Object wrappedBean = applyBeanPostProcessorBeforeInitialization(bean, beanName);
+        Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         try {
             invokeInitMethods(beanName, wrappedBean, beanDefinition);
@@ -115,12 +152,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throw new BeansException("Invocation of init method of bean[" + beanName + "] failed", e);
         }
 
-        wrappedBean = applyBeanPostProcessorAfterInitialization(wrappedBean, beanName);
+        wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
         return wrappedBean;
     }
 
     @Override
-    public Object applyBeanPostProcessorBeforeInitialization(Object existingBean, String beanName) throws BeansException {
+    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
         Object result = existingBean;
         for(BeanPostProcessor processor : getBeanPostProcessors()){
             Object current = processor.postProcessBeforeInitialization(result, beanName);
@@ -133,7 +170,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     @Override
-    public Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName) throws BeansException {
+    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
         Object result = existingBean;
         for(BeanPostProcessor processor : getBeanPostProcessors()){
             Object current = processor.postProcessAfterInitialization(result, beanName);

@@ -406,6 +406,27 @@ Advisor是包含**一个**Pointcut和一个Advice的组合，Pointcut用于捕�
 
 
 
+## 动态代理融入 bean 生命周期  
+
+> 分支21-auto-proxy  
+
+结合前面讲解的bean的生命周期，BeanPostProcessor处理阶段可以修改和替换bean，正好可以在此阶段返回代理对象替换原对象。不过我们引入一种特殊的BeanPostProcessor——InstantiationAwareBeanPostProcessor，如果InstantiationAwareBeanPostProcessor处理阶段返回代理对象，会导致短路，不会继续走原来的创建bean的流程，具体实现查看AbstractAutowireCapableBeanFactory#resolveBeforeInstantiation。
+
+DefaultAdvisorAutoProxyCreator是处理横切逻辑的织入返回代理对象的InstantiationAwareBeanPostProcessor实现类，当对象实例化时，生成代理对象并返回。
+
+至此，bean的生命周期如下：  
+
+![auto-proxy](./LEARNING.assets/auto-proxy.png)  
+
+
+
+- 问题：当获取实例时，如果是正常的bean，get时应该直接返回，因为有提前实例化所有单例bean，实例化后会加入singleton中，而代理类型的没有加入singleton这一步，也就是会执行两遍创建代理
+  - 这涉及到了getSingleton的逻辑优化，就放在下一节吧
+
+## getSingleton() 相关的优化  
+
+
+
 
 
 
