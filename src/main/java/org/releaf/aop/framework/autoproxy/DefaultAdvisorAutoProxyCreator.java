@@ -6,6 +6,7 @@ import org.releaf.aop.*;
 import org.releaf.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.releaf.aop.framework.ProxyFactory;
 import org.releaf.beans.BeansException;
+import org.releaf.beans.PropertyValues;
 import org.releaf.beans.factory.BeanFactory;
 import org.releaf.beans.factory.BeanFactoryAware;
 import org.releaf.beans.factory.config.BeanDefinition;
@@ -24,22 +25,20 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Class<?> beanClass, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         // 避免死循环
-        if (isInfrastructureClass(beanClass)) {
-            return null;
+        if (isInfrastructureClass(bean.getClass())) {
+            return bean;
         }
 
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectJExpressionPointcutAdvisor.class).values();
         try {
             for(AspectJExpressionPointcutAdvisor advisor : advisors) {
                 ClassFilter classFilter = advisor.getPointcut().getClassFilter();
-                if (classFilter.matches(beanClass)) {
+                if (classFilter.matches(bean.getClass())) {
                     AdvisedSupport advisedSupport = new AdvisedSupport();
 
-                    BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-                    Object bean = beanFactory.getInstantiationStrategy().instantiate(beanDefinition);
-                    TargetSource  targetSource = new TargetSource(bean);
+                    TargetSource targetSource = new TargetSource(bean);
                     advisedSupport.setTargetSource(targetSource);
                     advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
                     advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
@@ -51,7 +50,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
         } catch (Exception e) {
             throw new BeansException("Error create proxy bean for: " + beanName, e);
         }
-        return null;
+        return bean;
     }
 
     private boolean isInfrastructureClass(Class<?> beanClass) {
@@ -61,12 +60,23 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
     }
 
     @Override
+    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+        return null;
+    }
+
+    @Override
+    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+        return true;
+    }
+
+    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
+    public PropertyValues postPorcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
+        return pvs;
     }
+
 }

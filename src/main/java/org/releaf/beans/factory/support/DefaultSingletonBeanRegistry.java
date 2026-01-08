@@ -2,7 +2,6 @@ package org.releaf.beans.factory.support;
 
 import org.releaf.beans.BeansException;
 import org.releaf.beans.factory.DisposableBean;
-import org.releaf.beans.factory.ObjectFactory;
 import org.releaf.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.ArrayList;
@@ -21,17 +20,6 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
         return singletonObjects.get(beanName);
     }
 
-    @Override
-    public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
-        Object singletonObject = singletonObjects.get(beanName);
-        if (singletonObject == null && singletonFactory != null) {
-            singletonObject = singletonFactory.getObject();
-            if (singletonObject != null) {
-                addSingleton(beanName, singletonObject);
-            }
-        }
-        return singletonObject;
-    }
 
     public void addSingleton(String beanName, Object singletonObject) {
         singletonObjects.put(beanName, singletonObject);
