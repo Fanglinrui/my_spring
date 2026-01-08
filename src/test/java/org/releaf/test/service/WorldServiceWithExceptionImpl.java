@@ -6,4 +6,9 @@ public class WorldServiceWithExceptionImpl implements WorldService {
         System.out.println("The Earth is going to explode, but with an EXCEPTION");
         throw new RuntimeException();
     }
+
+    @Override
+    public String getName() {
+        return "";
+    }
 }

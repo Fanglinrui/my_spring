@@ -373,7 +373,7 @@ Spring将AOP联盟中的Advice细化出各种类型的Advice，常用的有Befor
 
 具体的，扩展的拦截器中就是这样一个执行过程  
 
-```
+```java
 try {
 	beforeAdvice.before();
 	invocation.proceed();
@@ -429,7 +429,48 @@ DefaultAdvisorAutoProxyCreator是处理横切逻辑的织入返回代理对象�
 
 新增了 ObjectFactory 这个接口，然后重载了 getSingleton() 这个方法，并稍微修改了getBean的逻辑，从而使代理对象能够加入 singletonObjects
 
+这个方法治标不治本，通过测试可以发现虽然能够将代理对象放入singletonObjects中，但是短路仍然发生，导致**属性填充**被跳过了。
 
+解决方法在原项目中提到了，我放在下一节当中。  
+
+## 解决“没有为代理bean设置属性”的问题  
+
+> 分支23-populate-proxy-bean-with-property-values  
+
+> 从原项目中拿来原文:
+>
+> 问题现象：没有为代理bean设置属性
+>
+> 问题原因：织入逻辑在InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation中执行，而该方法如果返回非null，会导致"短路"，不会执行后面的设置属性逻辑。因此如果该方法中返回代理bean后，不会为代理bean设置属性。
+>
+> 修复方案：跟spring保持一致，将织入逻辑迁移到BeanPostProcessor#postProcessAfterInitialization，即将DefaultAdvisorAutoProxyCreator#postProcessBeforeInstantiation的内容迁移到DefaultAdvisorAutoProxyCreator#postProcessAfterInitialization中。
+>
+> 顺便完善spring的扩展机制，为InstantiationAwareBeanPostProcessor增加postProcessAfterInstantiation方法，该方法在bean实例化之后设置属性之前执行。
+
+一个容易踩的坑是：误以为 `singletonObjects` 中的代理对象是由
+ `AbstractAutowireCapableBeanFactory#resolveBeforeInstantiation` 创建的。
+ 实际上，在常规（非循环依赖）场景下，代理对象是由实现了
+ `InstantiationAwareBeanPostProcessor和BeanPostProcessor` 的
+ `DefaultAdvisorAutoProxyCreator`，
+ 在其继承的 `BeanPostProcessor#postProcessAfterInitialization` 阶段，
+ 通过 `AbstractAutoProxyCreator#wrapIfNecessary` 创建的。
+
+- `AbstractAutowireCapableBeanFactory#resolveBeforeInstantiation` 并不是默认的代理创建路径，
+   而是 Spring 为 AOP / 容器扩展预留的一个“实例化前短路返回对象”的扩展入口，
+   主要用于提前代理（如循环依赖场景）  
+
+所以**Spring AOP 有两条代理创建路径：**
+
+- **初始化后代理（主路径）**：
+   `postProcessAfterInitialization → wrapIfNecessary`
+  - 代理直接进入 `singletonObjects`
+- **实例化前代理（备用路径）**：
+   `resolveBeforeInstantiation → XXprocessor.postProcessBeforeInstantiation ` 
+  - 用于循环依赖等特殊场景
+
+至此，bean的生命周期比较完整了，如下：
+
+![populate-proxy-bean-with-property-values.drawio](./LEARNING.assets/populate-proxy-bean-with-property-values.drawio.png)
 
 
 
@@ -483,6 +524,22 @@ public class TargetSource {
 - 所以如果你走 JDK 动态代理，就得知道目标对象有哪些接口。
 
 对于 CGLIB 代理，通常用的是 `setSuperclass(target.getClass())`，就不依赖接口了
+
+## 或者通过创建逻辑来区分两种代理：  
+
+```java
+private AopProxy createAopProxy(){
+        // 要不要“基于类本身做代理”？
+        if(advisedSupport.isProxyTargetClass()) {
+            return new CglibAopProxy(advisedSupport);
+        }
+
+        return new JdkDynamicAopProxy(advisedSupport);
+    }
+```
+
+
+
 
 ## Spring AOP 执行链路
 

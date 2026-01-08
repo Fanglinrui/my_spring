@@ -15,6 +15,7 @@ public class ProxyFactory {
     }
 
     private AopProxy createAopProxy(){
+        // 要不要“基于类本身做代理”？
         if(advisedSupport.isProxyTargetClass()) {
             return new CglibAopProxy(advisedSupport);
         }

@@ -25,22 +25,8 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         }
 
         BeanDefinition beanDefinition = getBeanDefinition(name);
-        Object bean;
-
-        if (beanDefinition.isSingleton()) {
-            bean = getSingleton(name, () -> {
-                try {
-                    return createBean(name, beanDefinition);
-                } catch (BeansException e) {
-                    destroySingleton(name);
-                    throw e;
-                }
-            });
-        } else {
-            // 原型，直接创建无缓存
-            bean = createBean(name, beanDefinition);
-        }
-        // 统一后处理
+        Object bean = createBean(name, beanDefinition);
+       // 统一后处理
         return getObjectForBeanInstance(bean, name);
     }
 
