@@ -472,7 +472,21 @@ DefaultAdvisorAutoProxyCreator是处理横切逻辑的织入返回代理对象�
 
 ![populate-proxy-bean-with-property-values.drawio](./LEARNING.assets/populate-proxy-bean-with-property-values.drawio.png)
 
+# 扩展篇  
 
+终于来到了新的环节，预计有配置信息、包扫描、@Value、@Autowired注解以及类型转换这几个  
+
+## PropertyPlaceholderConfigurer  
+
+> 分支24-property-placeholder-configurer
+
+经常需要将配置信息配置在properties文件中，然后在XML文件中以占位符的方式引用。
+
+实现思路很简单，在bean实例化之前，编辑BeanDefinition，解析XML文件中的占位符，然后用properties文件中的配置值替换占位符。而`BeanFactoryPostProcessor`具有编辑BeanDefinition的能力，因此`PropertyPlaceholderConfigurer`继承自BeanFactoryPostProcessor。  
+
+需要注意的一个点就是，不能直接把替换值当作实际的属性，因为可能是这样的：`${jdbc.url}?useSSL=false` ，所以要用一个buffer存原来的，然后用replace来替换对应的地方。  
+
+- 也就是说要`new PropertyValue(propertyValue.getName(), buf.toString())` 而不能 `(new PropertyValue(propertyValue.getName(), properties.getProperty(propKey))`  
 
 
 
