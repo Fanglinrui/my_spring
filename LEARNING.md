@@ -488,7 +488,20 @@ DefaultAdvisorAutoProxyCreator是处理横切逻辑的织入返回代理对象�
 
 - 也就是说要`new PropertyValue(propertyValue.getName(), buf.toString())` 而不能 `(new PropertyValue(propertyValue.getName(), properties.getProperty(propKey))`  
 
+## 包扫描  
 
+> 分支25-package-scan  
+
+在 **Spring 里，“包扫描（component scan）”的核心作用只有一句话：
+  \**自动发现并注册 Bean\**，省得你一个一个手写 `<bean>` 或 `@Bean`。**
+
+实际上应该叫组件扫描，因为包只是手段，而目的是组件
+
+结合bean的生命周期，包扫描只不过是扫描特定注解的类，提取类的相关信息组装成BeanDefinition注册到容器中。
+
+在XmlBeanDefinitionReader中解析```<context:component-scan />```标签，扫描类组装BeanDefinition然后注册到容器中的操作在ClassPathBeanDefinitionScanner#doScan中实现。
+
+此刻，属性所需要的值就来自于上一节的property文件、以及下面几节实现的`@Autowired和@Value注解`
 
 # 附录
 
