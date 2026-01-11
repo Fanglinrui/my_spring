@@ -1,5 +1,8 @@
 package org.releaf.test.bean;
 
+import org.releaf.stereotype.Component;
+
+@Component
 public class Car {
 
     private String brand;

@@ -2,6 +2,8 @@ package org.releaf.beans.factory.config;
 
 import org.releaf.beans.PropertyValues;
 
+import java.util.Objects;
+
 /**
  *  * BeanDefinition实例保存bean的信息，包括class类型、方法构造参数、是否为单例等，此处简化只包含class类型，以及bean属性
  */
@@ -58,5 +60,18 @@ public class BeanDefinition {
 
     public String getDestroyMethodName() { return destroyMethodName; }
     public void setDestroyMethodName(String destroyMethodName) { this.destroyMethodName = destroyMethodName; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BeanDefinition that = (BeanDefinition) o;
+        return beanClass.equals(that.beanClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(beanClass);
+    }
 
 }
