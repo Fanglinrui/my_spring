@@ -1,6 +1,7 @@
 package org.releaf.context.annotation;
 
 import cn.hutool.core.util.StrUtil;
+import org.releaf.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.releaf.beans.factory.config.BeanDefinition;
 import org.releaf.beans.factory.support.BeanDefinitionRegistry;
 import org.releaf.stereotype.Component;
@@ -8,6 +9,8 @@ import org.releaf.stereotype.Component;
 import java.util.Set;
 
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {
+
+    private static final String AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME = "org.releaf.context.annotation.internalAutowiredAnnotationProcessor";
 
     private BeanDefinitionRegistry registry;
 
@@ -32,6 +35,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
             }
         }
+
+        // 注册处理@Autowired和@Value注解的BeanPostProcessor
+        registry.registerBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, new BeanDefinition(AutowiredAnnotationBeanPostProcessor.class));
 
     }
 

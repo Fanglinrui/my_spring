@@ -5,6 +5,7 @@ import org.releaf.beans.factory.FactoryBean;
 import org.releaf.beans.factory.config.BeanDefinition;
 import org.releaf.beans.factory.config.BeanPostProcessor;
 import org.releaf.beans.factory.config.ConfigurableBeanFactory;
+import org.releaf.util.StringValueResolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     private final Map<String, Object> factoryBeanObjectCache = new HashMap<>();
+
+    private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -80,6 +83,18 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     public List<BeanPostProcessor> getBeanPostProcessors(){
         return this.beanPostProcessors;
+    }
+
+    public void addEmbeddedValueResolver(StringValueResolver resolver){
+        this.embeddedValueResolvers.add(resolver);
+    }
+
+    public String resolveEmbeddedValue(String value){
+        String result = value;
+        for (StringValueResolver resolver : this.embeddedValueResolvers) {
+            result = resolver.resolveStringValue(value);
+        }
+        return result;
     }
 
 }
